@@ -1,5 +1,5 @@
 import api from "../Api";
-import { API_KEY } from "../../Constants";
+import { API_KEY } from "../../utils/Constants";
 
 
 export async function getMoviePopular(page) {

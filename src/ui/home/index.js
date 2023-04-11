@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, Image, TouchableOpacity, View } from "react-native";
 import { getMoviePopular } from "../../service/requests/MovieRequest";
 import styles from "./styles";
-import { imageUrl } from "../../Constants";
+import { imageUrl } from "../../utils/Constants";
 
 export default function Home({ navigation }) {
     const [data, setData] = useState([])

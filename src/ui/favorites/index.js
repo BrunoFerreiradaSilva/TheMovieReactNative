@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { FlatList, Image, TouchableOpacity, View } from "react-native";
 import styles from "./styles";
-import { imageUrl } from "../../Constants";
-import { getAllMovies } from "../../Movies";
+import { imageUrl } from "../../utils/Constants";
+import { getAllMovies } from "../../database/Movies";
 
 export default function Favorites({ navigation }) {
     const [data, setData] = useState([])

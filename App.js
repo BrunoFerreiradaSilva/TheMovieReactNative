@@ -2,7 +2,7 @@ import { SafeAreaView } from 'react-native';
 import Routes from './src/Routes';
 import { StatusBar } from 'react-native';
 import { useEffect } from 'react';
-import { criaTabela } from './src/Movies';
+import { criaTabela } from './src/database/Movies';
 
 
 export default function App() {

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, ImageBackground, FlatList, Image, TouchableOpacity } from "react-native";
 import { getMovieDetails, getSimilarMovie } from "../../service/requests/MovieRequest";
-import { imageUrl } from "../../Constants";
+import { imageUrl } from "../../utils/Constants";
 import styles from "./styles";
 import { MaterialIcons } from '@expo/vector-icons';
-import { getAllMovies, getMovie, removeMovie, saveMovie } from "../../Movies";
+import { getMovie, removeMovie, saveMovie } from "../../database/Movies";
 
 export default function Details({ route, navigation }) {
     const [movie, setMovie] = useState({})
