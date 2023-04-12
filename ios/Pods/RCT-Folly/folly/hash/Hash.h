@@ -33,6 +33,10 @@
 #include <folly/hash/SpookyHashV2.h>
 #include <folly/lang/Bits.h>
 
+#if FOLLY_HAS_STRING_VIEW
+#include <string_view>
+#endif
+
 namespace folly {
 namespace hash {
 
@@ -69,6 +73,15 @@ constexpr uint64_t hash_128_to_64(
   b ^= (b >> 47);
   b *= kMul;
   return b;
+}
+
+// Order-independent way to reduce multiple 64 bit hashes into a single hash.
+FOLLY_DISABLE_UNDEFINED_BEHAVIOR_SANITIZER("unsigned-integer-overflow")
+constexpr uint64_t commutative_hash_128_to_64(
+    const uint64_t upper, const uint64_t lower) noexcept {
+  // Commutative accumulator taken from this paper:
+  // https://www.preprints.org/manuscript/201710.0192/v1/download
+  return 3860031 + (upper + lower) * 2779 + (upper * lower * 2);
 }
 
 //  twang_mix64
@@ -292,12 +305,13 @@ inline uint64_t fnva64(
 
 #define get16bits(d) folly::loadUnaligned<uint16_t>(d)
 
-inline uint32_t hsieh_hash32_buf(const void* buf, size_t len) noexcept {
+inline constexpr uint32_t hsieh_hash32_buf_constexpr(
+    const unsigned char* buf, size_t len) noexcept {
   // forcing signed char, since other platforms can use unsigned
-  const unsigned char* s = reinterpret_cast<const unsigned char*>(buf);
+  const unsigned char* s = buf;
   uint32_t hash = static_cast<uint32_t>(len);
-  uint32_t tmp;
-  size_t rem;
+  uint32_t tmp = 0;
+  size_t rem = 0;
 
   if (len <= 0 || buf == nullptr) {
     return 0;
@@ -346,6 +360,11 @@ inline uint32_t hsieh_hash32_buf(const void* buf, size_t len) noexcept {
 }
 
 #undef get16bits
+
+inline uint32_t hsieh_hash32_buf(const void* buf, size_t len) noexcept {
+  return hsieh_hash32_buf_constexpr(
+      reinterpret_cast<const unsigned char*>(buf), len);
+}
 
 inline uint32_t hsieh_hash32(const char* s) noexcept {
   return hsieh_hash32_buf(s, std::strlen(s));
@@ -552,6 +571,20 @@ struct hasher<std::string> {
 template <typename K>
 struct IsAvalanchingHasher<hasher<std::string>, K> : std::true_type {};
 
+#if FOLLY_HAS_STRING_VIEW
+template <>
+struct hasher<std::string_view> {
+  using folly_is_avalanching = std::true_type;
+
+  size_t operator()(const std::string_view& key) const {
+    return static_cast<size_t>(
+        hash::SpookyHashV2::Hash64(key.data(), key.size(), 0));
+  }
+};
+template <typename K>
+struct IsAvalanchingHasher<hasher<std::string_view>, K> : std::true_type {};
+#endif
+
 template <typename T>
 struct hasher<T, std::enable_if_t<std::is_enum<T>::value>> {
   size_t operator()(T key) const noexcept { return Hash()(to_underlying(key)); }
@@ -643,9 +676,7 @@ uint64_t commutative_hash_combine_value_generic(
     uint64_t seed, Hash const& hasher, Value const& value) {
   auto const x = hasher(value);
   auto const y = IsAvalanchingHasher<Hash, Value>::value ? x : twang_mix64(x);
-  // Commutative accumulator taken from this paper:
-  // https://www.preprints.org/manuscript/201710.0192/v1/download
-  return 3860031 + (seed + y) * 2779 + (seed * y * 2);
+  return commutative_hash_128_to_64(seed, y);
 }
 
 // hash_range combines hashes of items in the range [first, last) in an
