@@ -48,5 +48,12 @@ export default StyleSheet.create({
         marginVertical: 4,
         borderRadius: 6,
         resizeMode: 'stretch'
-    }
+    },
+    buttonImage: { marginStart: 8, marginBottom: 8, },
+    viewImage: { flexDirection: 'row', alignItems: 'center' },
+    viewColun: { flexDirection: 'column' },
+    textTitle: { fontSize: 16, lineHeight: 26, marginEnd: 100 },
+    viewRow: { flexDirection: 'row', marginTop: 4 },
+    viewRowCenter:{ flexDirection: 'row', alignItems: 'center' },
+    viewAling: { alignItems: 'flex-end', alignContent: 'flex-end' }
 })

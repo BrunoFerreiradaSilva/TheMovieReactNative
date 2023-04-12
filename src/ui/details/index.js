@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ImageBackground, FlatList, Image, TouchableOpacity } from "react-native";
+import { FlatList} from "react-native";
 import { getMovieDetails, getSimilarMovie } from "../../service/requests/MovieRequest";
-import { imageUrl } from "../../utils/Constants";
-import styles from "./styles";
-import { MaterialIcons } from '@expo/vector-icons';
 import { getMovie, removeMovie, saveMovie } from "../../database/Movies";
+import ListSimilarComponent from "./components/listComponent";
+import HeaderComponent from "./components/headerComponent";
 
 export default function Details({ route, navigation }) {
     const [movie, setMovie] = useState({})
@@ -70,7 +69,6 @@ export default function Details({ route, navigation }) {
             poster: movie.poster_path
         }
 
-        console.log(movieForSave)
         if (!isFavorite) {
             setIsFavorite(true)
             await saveMovie(movieForSave)
@@ -103,54 +101,4 @@ export default function Details({ route, navigation }) {
             />}
         />
     )
-
-}
-
-
-function ListSimilarComponent({ data, navigation }) {
-    return <TouchableOpacity style={{ marginStart: 8, marginBottom: 8, }} onPress={() => navigation.navigate('Details', { paramKey: data.id })}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Image source={{ uri: imageUrl + data.poster_path }} style={styles.imageSimilarMovie} />
-            <View style={{ flexDirection: 'column' }}>
-                <Text style={{ fontSize: 16, lineHeight: 26, marginEnd: 100 }}>{data.title}</Text>
-                <View style={{ flexDirection: 'row', marginTop: 4 }}>
-                    <Text>Votos : </Text>
-                    <Text>{data.vote_average}</Text>
-                </View>
-            </View>
-        </View>
-
-    </TouchableOpacity>
-}
-
-function HeaderComponent({ movie, formatDate, productor, isFavorite, saveFavorite, removeFavorite, idFavorite }) {
-    return <View>
-        <View>
-
-            <ImageBackground source={{ uri: movie.backdrop_path ? imageUrl + movie.backdrop_path : imageUrl + movie.poster_path }} style={styles.container} >
-                <View style={styles.viewBackground}>
-                    <View style={{ flexDirection: 'row' }}>
-                        <Text style={styles.releseText}>{formatDate + " - "}</Text>
-                        <Text style={styles.productorText}>{productor}</Text>
-                    </View>
-                    <Text style={styles.title}>{movie.title}</Text>
-
-                </View>
-
-            </ImageBackground>
-
-        </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Text style={styles.descriptionTitle}>Descrição</Text>
-            <TouchableOpacity onPress={() => {
-                isFavorite ? removeFavorite(idFavorite) : saveFavorite(movie)
-            }}>
-                <View style={{ alignItems: 'flex-end', alignContent: 'flex-end' }}>
-                    {isFavorite ? <MaterialIcons name="favorite" size={24} color="red" /> : <MaterialIcons name="favorite-border" size={24} color="black" />}
-                </View>
-            </TouchableOpacity>
-        </View>
-        <Text style={styles.description}>{movie.overview}</Text>
-        <Text style={styles.descriptionTitle}>Similar</Text>
-    </View>
 }
