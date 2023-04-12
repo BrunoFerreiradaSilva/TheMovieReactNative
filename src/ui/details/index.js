@@ -45,7 +45,6 @@ export default function Details({ route, navigation }) {
             setIdFavorite(result[0].id)
         } else {
             setIsFavorite(false)
-            setIdFavorite(0)
         }
     }
 
@@ -54,7 +53,7 @@ export default function Details({ route, navigation }) {
         setMovie(result)
         const date = result.release_date.split("-")[0]
         setFormatDate(date)
-        const productor = result.production_companies[0].name
+        const productor = result.production_companies[0]?.name
         setProductor(productor)
         verifyFavorite(movieId)
     }
