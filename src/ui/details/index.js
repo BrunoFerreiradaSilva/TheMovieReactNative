@@ -5,6 +5,7 @@ import { getMovie, removeMovie, saveMovie } from "../../database/Movies";
 import ListSimilarComponent from "./components/listComponent";
 import HeaderComponent from "./components/headerComponent";
 
+
 export default function Details({ route, navigation }) {
     const [movie, setMovie] = useState({})
     const [formatDate, setFormatDate] = useState('')

@@ -1,0 +1,6 @@
+module Pods_hook_hookTests {
+  umbrella header "Pods-hook-hookTests-umbrella.h"
+
+  export *
+  module * { export * }
+}
