@@ -15,12 +15,11 @@ export default function Details({ route, navigation }) {
     const [idFavorite, setIdFavorite] = useState(0)
 
     useEffect(() => {
-        
         const parent = navigation.getParent();
         parent.setOptions({
             tabBarVisible: false
         });
-        verifyFavorite(route.params.paramKey)
+        verifyFavorite()
         getDetails(route.params.paramKey)
         getSimilar(route.params.paramKey)
 
@@ -36,17 +35,17 @@ export default function Details({ route, navigation }) {
         }
     }, [route.params.paramKey])
 
-    async function verifyFavorite(id) {
-        const result = await getMovie(id)
-        setIsFavorite(false)
+    async function verifyFavorite() {
+        setIdFavorite(false)
+        const result = await getMovie(route.params.paramKey)
         if (result == 0) return null
-        if (id === result[0].idMovie) {
+        if (route.params.paramKey === result[0].idMovie) {
             setIsFavorite(true)
             setIdFavorite(result[0].id)
         } else {
             setIsFavorite(false)
-            setIdFavorite(0)
         }
+
     }
 
     async function getDetails(movieId) {
@@ -56,7 +55,6 @@ export default function Details({ route, navigation }) {
         setFormatDate(date)
         const productor = result.production_companies[0].name
         setProductor(productor)
-        verifyFavorite(movieId)
     }
 
     async function getSimilar(idSimilar) {
